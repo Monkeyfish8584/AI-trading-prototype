@@ -1,0 +1,5 @@
+import type {ChartState,Overlay} from '../domain/types';
+export const initialState:ChartState={overlays:[],history:[]};
+type Action={type:'APPLY';overlays:Overlay[]}|{type:'SELECT';id:string}|{type:'REMOVE';id?:string;semanticKey?:string}|{type:'CLEAR'}|{type:'UNDO'};
+const snapshot=(s:ChartState)=>({overlays:s.overlays,selectedId:s.selectedId});const push=(s:ChartState)=>[...s.history,snapshot(s)].slice(-50);
+export function chartReducer(s:ChartState,a:Action):ChartState{if(a.type==='SELECT')return{...s,selectedId:a.id};if(a.type==='UNDO'){const prior=s.history.at(-1);return prior?{...prior,history:s.history.slice(0,-1)}:s}if(a.type==='CLEAR')return s.overlays.length?{overlays:[],history:push(s)}:s;if(a.type==='REMOVE'){const overlays=s.overlays.filter(o=>o.id!==a.id&&o.semanticKey!==a.semanticKey);return overlays.length===s.overlays.length?s:{overlays,history:push(s)}}const duplicate=a.overlays.find(n=>s.overlays.some(o=>o.semanticKey===n.semanticKey));if(duplicate)return{...s,selectedId:s.overlays.find(o=>o.semanticKey===duplicate.semanticKey)!.id};return{overlays:[...s.overlays,...a.overlays],selectedId:a.overlays[0]?.id,history:push(s)}}
