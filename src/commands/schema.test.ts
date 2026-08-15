@@ -1,0 +1,2 @@
+import{describe,expect,it}from'vitest';import{validateCommand}from'./schema';
+describe('untrusted command schema',()=>{it('rejects invented prices and unknown fields',()=>{expect(validateCommand({type:'ADD_MONDAY_OPEN',week:'current',resolvedPrice:123}).success).toBe(false);expect(validateCommand({type:'ADD_EMA',period:20,source:'close'}).success).toBe(false)});it('allows only explicit horizontal prices',()=>expect(validateCommand({type:'ADD_HORIZONTAL_LINE',userPrice:123.4}).success).toBe(true))});
